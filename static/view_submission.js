@@ -6,6 +6,10 @@ var jsonCall = $.getJSON("/api/getPaymentMethods",function(){
         paymentMethodsResponse: jsonData,
         clientKey: "test_2GWNBLODVRBSLBBSJAZM2BVOUATCOSNH", // Web Drop-in versions before 3.10.1 use originKey instead of clientKey.
         locale: "en-GB",
+        amount: {
+            value: 1,
+            currency: "GBP"
+        },
         environment: "test",
         buttonType: 'plain',
         onSubmit: (state, dropin) => {
