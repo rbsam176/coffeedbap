@@ -3,7 +3,7 @@
 
 
 const configuration = {
-    paymentMethodsResponse: {"paymentMethods": [{"brands": ["mc", "visa"], "configuration": {"merchantId": "000000000200703", "merchantName": "CoffeeDBECOM"}, "details": [{"key": "applepay.token", "type": "applePayToken"}], "name": "Apple Pay", "type": "applepay"}, {"brands": ["mc", "visa"], "details": [{"key": "encryptedCardNumber", "type": "cardToken"}, {"key": "encryptedSecurityCode", "type": "cardToken"}, {"key": "encryptedExpiryMonth", "type": "cardToken"}, {"key": "encryptedExpiryYear", "type": "cardToken"}, {"key": "holderName", "optional": true, "type": "text"}], "name": "Credit Card", "type": "scheme"}]}, // The `/paymentMethods` response from the server.
+    paymentMethodsResponse: {"paymentMethods": [{"brands": ["mc", "visa"], "configuration": {"merchantId": "000000000200703", "merchantName": "CoffeeDBECOM"}, "details": [{"key": "applepay.token", "type": "applePayToken"}], "name": "Apple Pay", "type": "applepay"}, // The `/paymentMethods` response from the server.
     clientKey: "test_2GWNBLODVRBSLBBSJAZM2BVOUATCOSNH", // Web Drop-in versions before 3.10.1 use originKey instead of clientKey.
     locale: "en-GB",
     environment: "test",
