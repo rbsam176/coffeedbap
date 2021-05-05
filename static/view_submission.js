@@ -10,6 +10,7 @@ var jsonCall = $.getJSON("/api/getPaymentMethods",function(){
             value: 1,
             currency: "GBP"
         },
+        countryCode: "GB",
         environment: "test",
         buttonType: 'plain',
         onSubmit: (state, dropin) => {
@@ -62,11 +63,6 @@ var jsonCall = $.getJSON("/api/getPaymentMethods",function(){
             paymentMethodsConfiguration: {
             // Required configuration for Apple Pay
             applepay: {
-                amount: {
-                    value: 1,
-                    currency: "GBP"
-                },
-                countryCode: "GB",
                 onSubmit: (state) => {
                 // Call your server to make `/payments` request
                 makePayment(state.data)
