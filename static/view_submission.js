@@ -106,7 +106,7 @@ var jsonCall = $.getJSON("/api/getPaymentMethods",function(){
             }
             },
         })
-        .mount('#dropin');
+        .mount('#dropin-container');
 });
 
 
