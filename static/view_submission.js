@@ -2,6 +2,63 @@
 var jsonCall = $.getJSON("/api/getPaymentMethods",function(){
     var jsonData = JSON.parse(jsonCall.responseText);
 
+    const configuration = {
+        paymentMethodsResponse: jsonData,
+        clientKey: "test_2GWNBLODVRBSLBBSJAZM2BVOUATCOSNH", // Web Drop-in versions before 3.10.1 use originKey instead of clientKey.
+        locale: "en-GB",
+        environment: "test",
+        buttonType: 'plain',
+        onSubmit: (state, dropin) => {
+            // Global configuration for onSubmit
+            // Your function calling your server to make the `/payments` request
+            makePayment(state.data)
+            .then(response => {
+                if (response.action) {
+                // Drop-in handles the action object from the /payments response
+                dropin.handleAction(response.action);
+                } else {
+                // Your function to show the final result to the shopper
+                showFinalResult(response);
+                }
+            })
+            .catch(error => {
+                throw Error(error);
+            });
+        },
+        onAdditionalDetails: (state, dropin) => {
+        // Your function calling your server to make a `/payments/details` request
+        makeDetailsCall(state.data)
+            .then(response => {
+            if (response.action) {
+                // Drop-in handles the action object from the /payments response
+                dropin.handleAction(response.action);
+            } else {
+                // Your function to show the final result to the shopper
+                showFinalResult(response);
+            }
+            })
+            .catch(error => {
+            throw Error(error);
+            });
+        },
+        paymentMethodsConfiguration: {
+        card: { // Example optional configuration for Cards
+            hasHolderName: true,
+            holderNameRequired: true,
+            enableStoreDetails: true,
+            hideCVC: false, // Change this to true to hide the CVC field for stored cards
+            name: 'Credit or debit card',
+            onSubmit: () => {}, // onSubmit configuration for card payments. Overrides the global configuration.
+        }
+        }
+    };
+    const checkout = new AdyenCheckout(configuration);
+    // const dropin = checkout
+    //     .create('dropin', {
+    //     // Starting from version 4.0.0, Drop-in configuration only accepts props related to itself and cannot contain generic configuration like the onSubmit event.
+    //         openFirstPaymentMethod:false
+    //     })
+    // .mount('#dropin-container');
     const dropin = checkout
         .create('dropin', {
             paymentMethodsConfiguration: {
@@ -50,68 +107,6 @@ var jsonCall = $.getJSON("/api/getPaymentMethods",function(){
             },
         })
         .mount('#dropin');
-
-        const checkout = new AdyenCheckout(configuration);
-
-
-    // const configuration = {
-    //     paymentMethodsResponse: jsonData,
-    //     clientKey: "test_2GWNBLODVRBSLBBSJAZM2BVOUATCOSNH", // Web Drop-in versions before 3.10.1 use originKey instead of clientKey.
-    //     locale: "en-GB",
-    //     environment: "test",
-    //     buttonType: 'plain',
-    //     onSubmit: (state, dropin) => {
-    //         // Global configuration for onSubmit
-    //         // Your function calling your server to make the `/payments` request
-    //         makePayment(state.data)
-    //         .then(response => {
-    //             if (response.action) {
-    //             // Drop-in handles the action object from the /payments response
-    //             dropin.handleAction(response.action);
-    //             } else {
-    //             // Your function to show the final result to the shopper
-    //             showFinalResult(response);
-    //             }
-    //         })
-    //         .catch(error => {
-    //             throw Error(error);
-    //         });
-    //     },
-    //     onAdditionalDetails: (state, dropin) => {
-    //     // Your function calling your server to make a `/payments/details` request
-    //     makeDetailsCall(state.data)
-    //         .then(response => {
-    //         if (response.action) {
-    //             // Drop-in handles the action object from the /payments response
-    //             dropin.handleAction(response.action);
-    //         } else {
-    //             // Your function to show the final result to the shopper
-    //             showFinalResult(response);
-    //         }
-    //         })
-    //         .catch(error => {
-    //         throw Error(error);
-    //         });
-    //     },
-    //     paymentMethodsConfiguration: {
-    //     card: { // Example optional configuration for Cards
-    //         hasHolderName: true,
-    //         holderNameRequired: true,
-    //         enableStoreDetails: true,
-    //         hideCVC: false, // Change this to true to hide the CVC field for stored cards
-    //         name: 'Credit or debit card',
-    //         onSubmit: () => {}, // onSubmit configuration for card payments. Overrides the global configuration.
-    //     }
-    //     }
-    // };
-    // const checkout = new AdyenCheckout(configuration);
-    // const dropin = checkout
-    //     .create('dropin', {
-    //     // Starting from version 4.0.0, Drop-in configuration only accepts props related to itself and cannot contain generic configuration like the onSubmit event.
-    //         openFirstPaymentMethod:false
-    //     })
-    // .mount('#dropin-container');
-
 });
 
 
