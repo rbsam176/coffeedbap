@@ -3,7 +3,9 @@ import random
 from datetime import datetime, timezone
 import math
 import json
+import requests
 import re
+import Adyen
 from imagekitio.client import ImageKit
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import (
@@ -22,13 +24,39 @@ app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
 
 mongo = PyMongo(app)
 
+adyen = Adyen.Adyen()
+
+adyen.payment.client.platform = "test"
+adyen.payment.client.xapikey = "AQEjhmfuXNWTK0Qc+iSTnWI+ouG/ai5LtUYtceXBO9AomN3Pd5MQwV1bDb7kfNy1WIxIIkxgBw==-vMqqrpZXCpV7dRPgBvrtVNjLDXut0eP4tO/smOHPFu0=-Cv2EE~+{Mf6dGfN9"
+
+
+def adyen_payment_methods():
+    payment_methods_request = {
+        'merchantAccount': 'CoffeeDBECOM',
+        'reference': 'paymentMethods call',
+        'shopperReference': 'Python Checkout Shopper',
+        'channel': 'Web',
+    }
+    print("/paymentMethods request:\n" + str(payment_methods_request))
+
+    payment_methods_response = adyen.checkout.payment_methods(payment_methods_request)
+    formatted_response = json.dumps((json.loads(payment_methods_response.raw_response)))
+    
+    print("/paymentMethods response:\n" + formatted_response)
+    return formatted_response
+
+@app.route('/api/getPaymentMethods', methods=['GET', 'POST'])
+def get_payment_methods():
+    payment_methods_response = adyen_payment_methods()
+    return payment_methods_response
+
+
 # IMAGEKIT AUTH
 imagekit = ImageKit(
     private_key=os.environ.get("IMAGEKIT_PRIVATE"),
     public_key=os.environ.get("IMAGEKIT_PUBLIC"),
     url_endpoint=os.environ.get("IMAGEKIT_ENDPOINT")
 )
-
 
 @app.route('/autocomplete', methods=['GET'])
 def autocomplete():
@@ -1113,4 +1141,4 @@ def logout():
 if __name__ == "__main__":
     app.run(host=os.environ.get("IP"),
             port=int(os.environ.get("PORT")),
-            debug=False)
+            debug=True)
