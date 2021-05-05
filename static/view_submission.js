@@ -69,29 +69,6 @@ var jsonCall = $.getJSON("/api/getPaymentMethods",function(){
                     currency: "EUR"
                 },
                 countryCode: "DE",
-                // Configuration object is required if using version earlier than v 3.17.1.
-                // Omit this object when using version 3.17.1 and later.
-                configuration: {
-                // Name to be displayed on the form
-                merchantName: 'Adyen Test merchant',
-                // Your Apple merchant identifier as described in https://developer.apple.com/documentation/apple_pay_on_the_web/applepayrequest/2951611-merchantidentifier
-                merchantId: 'adyen.test.merchant'
-                },
-                // onValidateMerchant is required if using your own Apple Pay certificate or Web Drop-in earlier than v3.16.0.
-                // Omit this object when using version 3.16.0 and later.
-                onValidateMerchant: (resolve, reject, validationURL) => {
-                // Your server uses the validation URL to request a session from the Apple Pay server.
-                // Call resolve(MERCHANTSESSION) or reject() to complete merchant validation.
-                validateMerchant(validationURL)
-                    .then(response => {
-                    // Complete merchant validation with resolve(MERCHANTSESSION) after receiving an opaque merchant session object, MerchantSession
-                    resolve(response);
-                    })
-                    .catch(error => {
-                    // Complete merchant validation with reject() if any error occurs
-                    reject();
-                    });
-                },
                 onSubmit: (state) => {
                 // Call your server to make `/payments` request
                 makePayment(state.data)
