@@ -51,6 +51,8 @@ var jsonCall = $.getJSON("/api/getPaymentMethods",function(){
         })
         .mount('#dropin');
 
+        const checkout = new AdyenCheckout(configuration);
+
 
     // const configuration = {
     //     paymentMethodsResponse: jsonData,
