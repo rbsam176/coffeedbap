@@ -37,16 +37,17 @@ def adyen_payment_methods():
         'shopperReference': 'Python Checkout Shopper',
         'channel': 'Web',
     }
-    print("/paymentMethods request:\n" + str(payment_methods_request))
+    # print("/paymentMethods request:\n" + str(payment_methods_request))
 
     payment_methods_response = adyen.checkout.payment_methods(payment_methods_request)
     formatted_response = json.dumps((json.loads(payment_methods_response.raw_response)))
     
-    print("/paymentMethods response:\n" + formatted_response)
+    # print("/paymentMethods response:\n" + formatted_response)
     return formatted_response
 
 @app.route('/api/getPaymentMethods', methods=['GET', 'POST'])
 def get_payment_methods():
+    print(adyen_payment_methods())
     payment_methods_response = adyen_payment_methods()
     return payment_methods_response
 
