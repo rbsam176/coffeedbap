@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% import 'individual_card.html' as single_card %}
+{% import 'quick_search.html' as quickSearch %}
+
+{% block title %}CoffeeDB{% endblock %}
+{% block styles %}
+    <link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css" rel="stylesheet"/>
+{% endblock %}
+
+{% block content %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="row justify-content-center text-center py-2 index-message">
+                    <div class="col-10 alert {% if category == 'warning' %}alert-warning{% endif %}{% if category == 'success' %}alert-success{% endif %}" role="alert">
+                        {{ message }}
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <div id="index-bg" class="container-fluid d-flex">
+        <div id="logoNav" class="row justify-content-center align-self-center">
+            <div id="logo" class="text-center mt-2"><a href="{{ url_for('index') }}"><span class="h1 coffee-title home-title">Coffee</span><span class="ml-2 h1 db-title home-title">DB</span></a>
+                <img class="bean-icon bean2" src="{{ url_for('static', filename='assets/bean2.png') }}" alt="bean icon" />
+                <img class="bean-icon bean3" src="{{ url_for('static', filename='assets/bean3.png') }}" alt="bean icon" />
+            </div>
+            <div class="col-12">
+                <div class="text-center mt-4 mx-2 sub-title">Helping you find your perfect brew</div>
+            </div>
+            <nav id="homeNav" class="mt-2 mx-2 row">
+                <div class="col-9 col-lg-3 mx-auto">
+                    <a class="home-btn my-2" href="{{ url_for('browse') }}">Browse</a>
+                </div>
+                {% if session.user %}
+                    <div class="col-9 col-lg-3 mx-auto">
+                        <a class="home-btn my-2" href="{{ url_for('add') }}">Add</a>
+                    </div>
+                    <div class="col-9 col-lg-3 mx-auto">
+                        <a class="home-btn my-2" href="{{ url_for('profile', username=session['user']) }}">Profile</a>
+                    </div>
+                    <div class="col-9 col-lg-3 mx-auto">
+                        <a class="home-btn my-2" href="{{ url_for('logout') }}">Logout</a>
+                    </div>
+                {% else %}
+                    <div class="col-9 col-lg-3 mx-auto">
+                        <a class="home-btn my-2" href="{{ url_for('login') }}">Login</a>
+                    </div>
+                    <div class="col-9 col-lg-3 mx-auto">
+                        <a class="home-btn my-2" href="{{ url_for('signup') }}">Sign Up</a>
+                    </div>
+                {% endif %}
+            </nav>
+            <img class="bean-icon bean1" src="{{ url_for('static', filename='assets/bean1.png') }}" alt="bean icon" />
+            <div class="col-12 text-center my-4">
+                <a class="down-btn" href="#main"><i class="bi bi-chevron-compact-down"></i></a>
+            </div>
+        </div>
+    </div>
+    {{ navbar.input() }}
+    <a class="anchor" id="main"></a>
+    <div class="container-fluid mt-4">
+        <div class="row mt-2">
+            <div class="col-12 col-md-12 col-lg-4 order-12 order-md-12 order-lg-11 px-2 h-100">
+                <div class="row mx-2">
+                    <form id="quickSearch" name="quickSearch" class="text-center w-100" method="POST">
+                        {{ quickSearch.input("quickSearch") }}
+                    </form>
+                </div>
+                <hr class="my-4">
+                <h4 class="text-center mt-4">Latest addition</h4>
+                {% if recentSubmission %}
+                    {{ single_card.input(recentSubmission) }}
+                {% else %}
+                    {% if session['user'] %}
+                        <h4 class="text-center mt-4">You haven't submitted any coffee beans yet!</h4>
+                        <h5 class="text-center"><a href="{{ url_for('add') }}">Click here to add some!</a></h5>
+                    {% else %}
+                        <h4 class="text-center mt-4">No beans have been added yet!</h4>
+                        <h5 class="text-center"><a href="{{ url_for('signup') }}">Click here to signup so you can add some.</a></h5>
+                    {% endif %}
+                {% endif %}
+            </div>
+            <div class="col-12 col-md-12 col-lg-8 order-1 order-md-1 order-lg-12">
+                <div id="videoContainer" class="bg-dark d-flex row mx-1">
+                    <div id="overlayText" class="align-self-center ml-4">
+                        <span class="hero-text mb-2">
+                            Discover the perfect<br>
+                            coffee for you.<br>
+                        </span>
+                        <br>
+                        <a id="heroBrowse" href="{{ url_for('browse') }}">Browse</a>
+                    </div>
+                    <video autoplay muted playsinline class="welcomeVideo primary-video">
+                        <source src="{{ url_for('static', filename='assets/heroVideo1.mp4') }}" type="video/mp4">
+                    </video>
+                    <video autoplay muted playsinline class="welcomeVideo secondary-video">
+                        <source src="{{ url_for('static', filename='assets/heroVideo2.mp4') }}" type="video/mp4">
+                    </video>
+                </div>
+                <div class="d-flex row mt-2 mb-4">
+                    <div class="col-12 col-sm-6 col-md-6 col-lg-6">
+                        <h4 class="text-center mt-2">Top rated submissions</h4>
+                        <div class="custom-container py-2">
+                            {% if top5docs %}
+                                {% for item in top5docs %}
+                                    <div class="rating-row mx-3 my-2 row">
+                                        <div class="col-2 high-rated-entry p-2">{{ loop.index }}.</div>
+                                        <div class="col-9 my-auto">
+                                            <div class="row ml-1"><a href="{{ url_for('viewSubmission', submissionId=item[1]['_id']) }}">{{ item[1]['brand']|title }}: {{ item[1]['name']|title }}</a></div>
+                                            <div class="row ml-1 text-muted">Average <i class="mx-1 bi bi-star-fill star-rating"></i>{{ item[0][1]|float }} ({{ item[0][2] }} rating{% if item[0][2] > 1 %}s{% endif %})</div>
+                                        </div>
+                                        <div class="col-1 go-btn pt-2"><a href="{{ url_for('viewSubmission', submissionId=item[1]['_id']) }}"><i class="bi bi-arrow-right-short"></i></a></div>
+                                    </div>
+                                    {% if loop.index != top5docs|count %}<hr>{% endif %}
+                                {% endfor %}
+                            {% else %}
+                                <h4 class="text-center p-3">No beans have been rated yet!</h4>
+                                {% if session['user'] %}
+                                    <h5 class="text-center px-2">Go to the <a href="{{ url_for('browse') }}">Browse</a> page to find some submissions to rate.</h5>
+                                {% else %}
+                                    <h5 class="text-center px-2"><a href="{{ url_for('login') }}">Click here to login so you can start rating.</a></h5>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-6 col-lg-6">
+                        <h4 class="text-center mt-2">Recent reviews</h4>
+                        <div class="custom-container py-2">
+                            {% if recentReviews %}
+                                {% for review in recentReviews %}
+                                    <blockquote class="rating-row mx-3 d-flex my-2 row">
+                                        <div class="col-11 my-auto">
+                                            <div class="row mb-1 lead"><a href="{{ url_for('viewSubmission', submissionId=review[0]) }}">{{ review[1]|title }}: {{ review[2]|title }}</a></div>
+                                            <div class="row mb-1">{{ review[4].text }}</div>
+                                            <div class="row text-muted">
+                                                <span>
+                                                    <a href="{{ url_for('profile', username=review[4].username) }}">
+                                                        {{ review[4].username }}
+                                                    </a> on <cite>{{ review[4].reviewTimestamp.strftime('%d-%m-%Y %H:%M') }}</cite>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-1 go-btn align-self-center"><a href="{{ url_for('viewSubmission', submissionId=review[0]) }}"><i class="bi bi-arrow-right-short"></i></a></div>
+                                    </blockquote>
+                                    {% if loop.index != recentReviews|count %}<hr>{% endif %}
+                                {% endfor %}
+                            {% else %}
+                                <div class="p-2">
+                                    <h4 class="text-center">No reviews yet</h4>
+                                    <h5 class="text-center mt-3">Go to the <a href="{{ url_for('browse') }}">Browse</a> page to find some submissions to review.</h5>
+                                </div>
+                                {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script src="{{ url_for('static', filename='index.js') }}"></script>
+{% endblock %}

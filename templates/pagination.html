@@ -1,0 +1,41 @@
+{% macro input(pageQuantity, headerText, totalCount, page_variable, offset, formName) -%}
+    <div class="container">
+        <div class="row pt-2">
+            <div class="col-4 d-none d-md-block"></div>
+            <div class="col-12 col-lg-4">
+                <h2 class="text-center mx-auto justify-content-center">{{ headerText }} ({{ totalCount }})</h2>
+                {% if headerText == "Filtered results" %}<a href="{{ url_for('browse') }}"><h6 class="text-center">Clear filter <i class="bi bi-x-circle-fill"></i></h6></a>{% endif %}
+            </div>
+            <div class="col-12 col-lg-4 form-inline justify-content-center justify-content-lg-end my-2 my-lg-0">
+                <label class="pb-2 mr-2" for="sortSelect">Sort by</label>
+                <select form="{{ formName }}" id="sortSelect" name="sort" class="custom-select mb-2" onchange="this.form.submit()">
+                    <option {% if (request.args.get('sort') == 'dateDesc') or not (request.args.get('sort')) %}selected{% endif %} value="dateDesc">Date (Most Recent)</option>
+                    <option {% if request.args.get('sort') == 'dateAsc' %}selected{% endif %} value="dateAsc">Date (Oldest)</option>
+                    <option {% if request.args.get('sort') == 'nameAz' %}selected{% endif %} value="nameAz">Name (A > Z)</option>
+                    <option {% if request.args.get('sort') == 'nameZa' %}selected{% endif %} value="nameZa">Name (Z > A)</option>
+                    <option {% if request.args.get('sort') == 'brandAz' %}selected{% endif %} value="brandAz">Brand (A > Z)</option>
+                    <option {% if request.args.get('sort') == 'brandZa' %}selected{% endif %} value="brandZa">Brand (Z > A)</option>
+                </select>
+            </div>
+        </div>
+        <div class="row mt-lg-4 justify-content-center">
+            {% if pageQuantity > 1 %}
+            <div class="col-6 col-sm-2 order-sm-first text-left">
+                <button form="{{ formName }}" aria-label="Previous page" type="submit" name="page" class="pagination-btn" {% if page_variable == 1 %}disabled{% endif %} value="{{ page_variable - 1}}">
+                    <i class="bi bi-arrow-left-short align-self-center"></i>
+                </button>
+            </div>
+            {% endif %}
+            <div class="col-12 order-last col-sm-8 justify-content-center mt-2 mt-sm-0"> 
+                <h5 class="text-center mt-3">{% if not totalCount < 1 %}Showing results {{ offset + 1 }} to {% if offset + 6 < totalCount %}{{ offset + 6 }}{% else %}{{ totalCount }}{% endif %} <span class="d-inline-block">({% if page_variable %}Page {{ page_variable }}{% else %}Page 1{% endif %} of {{ pageQuantity }}){% else %}No results{% endif %}</span></h5>
+            </div>
+            {% if pageQuantity > 1 %}
+            <div class="col-6 col-sm-2 order-sm-last text-right">
+                <button form="{{ formName }}" aria-label="Next page" type="submit" name="page" class="pagination-btn" {% if page_variable == pageQuantity %}disabled{% endif %} value="{{ page_variable + 1}}">
+                    <i class="bi bi-arrow-right-short align-self-center"></i>
+                </button>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+{%- endmacro %}

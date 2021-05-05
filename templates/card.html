@@ -1,0 +1,10 @@
+{% macro input(data) -%}
+    {% import 'individual_card.html' as single_card %}
+    <div class="row gy-4">
+        {% for bean in data %}           
+            <div class="col-12 col-md-6 col-xl-4 p-2 my-2">
+                {{ single_card.input(bean) }}
+            </div>
+        {% endfor %}
+    </div>
+{%- endmacro %}

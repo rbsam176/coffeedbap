@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+{% import 'card.html' as card %}
+{% import 'pagination.html' as pagination %}
+{% import 'pagination_bottom.html' as pagination_bottom %}
+{% import 'quick_search.html' as quickSearch %}
+
+{% block title %}CoffeeDB: Browse {% if ("page" in request.args) and not (page_variable == 1) %}(Page {{ page_variable }}){% endif %}{% endblock %}
+
+{% block styles %}
+    <link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css" rel="stylesheet"/>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <!-- SEARCH -->
+        <div class="row justify-content-center">
+            <h2 class="text-center my-4">Browse</h2>
+        </div>
+        <form id="quickSearch" name="quickSearch" class="text-center w-100" method="POST">
+            {{ quickSearch.input("filterCriteria") }}
+        </form>
+        <!-- COLLAPSE BUTTON -->
+        <div class="row mt-4 mx-2 justify-content-center">
+            <button type="button" aria-label="Toggle filter controls visibility" class="btn filter-controls btn-lg btn-block" data-toggle="collapse" data-target="#browseCriteria">Open filter controls <i class="ml-2 bi bi-chevron-compact-down"></i></button>
+        </div>
+        <div id="browseCriteria" class="collapse">
+            <!-- FILTER -->
+            <div class="container-fluid">
+                <h2 class="text-center my-4">Filter criteria</h2>
+                <form class="row" method="GET" name="sentCriteria" id="filterCriteria">
+                    <!-- ROAST -->
+                    <div class="col-12 col-lg-4">
+                        <h4 class="text-center">Roast</h4>
+                        <div class="filter-checks form-group">
+                            {% for roast in roast_types %}
+                                <span class="checkbox-container text-center m-1">
+                                    <input type="checkbox" id="{{ roast }}" name="roast" value="{{ roast }}" {% if roast in request.args.getlist('roast') %}checked{% endif %}>
+                                    <label for="{{ roast }}" class="filter-toggle">{{ roast|title }}</label>
+                                </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <!-- ORIGIN -->
+                    <div class="col-12 col-lg-4 px-0">
+                        <h4 class="text-center">Origin</h4>
+                        <div class="row justify-content-center">
+                            {% for origin in originsOccurances %}
+                                <div class="checkbox-container m-1 {% if loop.index > 4 %}origin-box originOptionsExtra{% endif %}">
+                                    <input type="checkbox" id="{{ origin[0]|replace(' ', '') }}" name="origin" value="{{ origin[0] }}" {% if origin[0] in request.args.getlist('origin') %}checked{% endif %}>
+                                    <label for="{{ origin[0]|replace(' ', '') }}" class="filter-toggle">{{ origin[0]|title }}</label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <!-- SHOW MORE ORIGIN -->
+                        {% if originsOccurances|length > 4 %}
+                            <div class="row pb-2 justify-content-center">
+                                <button id="showMoreOrigin" aria-label="Toggle visibility of more origin options" type="button" class="show-more more-origin mt-2"><i class="bi bi-chevron-compact-down"></i></button>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <!-- ORGANIC -->
+                    <div class="col-12 col-lg-4">
+                        <div class="row">
+                            <div class="col-12 text-center form-group">
+                                <h4>Organic</h4>
+                                <div class="checkbox-container">
+                                    <input type="radio" id="organicFalse" name="organicRequired" value=False {% if not request.args %}checked{% elif request.args['organicRequired'] == 'False' %}checked{% elif 'organicRequired' not in request.args %}checked{% endif %}>
+                                    <label for="organicFalse" class="filter-toggle">Not required</label>
+                                    <input type="radio" id="organicTrue" name="organicRequired" value=True {% if request.args['organicRequired'] == "True" %}checked{% endif %}>
+                                    <label for="organicTrue" class="filter-toggle">Required</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <hr>
+            <!-- NOTES -->
+            <div class="container-fluid">
+                <div class="row justify-content-center">
+                    <h2 class="mt-4">Popular tasting notes</h2>
+                </div>
+                <div class="row my-4 justify-content-center">
+                    <label for="noteConditions">Show submissions containing</label>
+                    <select id="noteConditions" form="filterCriteria" class="mx-2" name="conditionType">
+                        <option value="all" {% if request.args['conditionType'] == 'all' %}selected{% endif %}>all</option>
+                        <option value="any" {% if request.args['conditionType'] == 'any' %}selected{% endif %}>any</option>
+                    </select>
+                    <label for="noteConditions">of the following notes</label>
+                </div>
+                <div id="notesContainer" class="row pb-2">
+                    <div class="col-12 col-lg-8 offset-lg-2 text-center">
+                        {% if shuffledNotes %}
+                            {% for item in shuffledNotes %}
+                                {% if item[1] > 75 %}
+                                    <span class="checkbox-container my-2 {% if (item[2] == 'extra-note') and (item[0] not in request.args.getlist('tag')) %}extra-note{% endif %}">
+                                        <input type="checkbox" id="note-{{ item[0]|replace(' ', '') }}" form="filterCriteria" name="tag" value="{{ item[0] }}" {% if item[0] in request.args.getlist('tag') %}checked{% endif %}>
+                                        <label for="note-{{ item[0]|replace(' ', '') }}" class="filter-toggle my-auto cloud-75 cloud-note">{{ item[0] }}</label>
+                                    </span>
+                                {% elif item[1] > 50 %}
+                                    <span class="checkbox-container my-2 {% if (item[2] == 'extra-note') and (item[0] not in request.args.getlist('tag')) %}extra-note{% endif %}">
+                                        <input type="checkbox" id="note-{{ item[0]|replace(' ', '') }}" form="filterCriteria" name="tag" value="{{ item[0] }}" {% if item[0] in request.args.getlist('tag') %}checked{% endif %}>
+                                        <label for="note-{{ item[0]|replace(' ', '') }}" class="filter-toggle cloud-50 cloud-note">{{ item[0] }}</label>
+                                    </span>
+                                {% elif item[1] > 25 %}
+                                    <span class="checkbox-container my-2 {% if (item[2] == 'extra-note') and (item[0] not in request.args.getlist('tag')) %}extra-note{% endif %}">
+                                        <input type="checkbox" id="note-{{ item[0]|replace(' ', '') }}" form="filterCriteria" name="tag" value="{{ item[0] }}" {% if item[0] in request.args.getlist('tag') %}checked{% endif %}>
+                                        <label for="note-{{ item[0]|replace(' ', '') }}" class="filter-toggle cloud-25 cloud-note">{{ item[0] }}</label>
+                                    </span>
+                                {% else %}
+                                    <span class="checkbox-container my-2 {% if (item[2] == 'extra-note') and (item[0] not in request.args.getlist('tag')) %}extra-note{% endif %}">
+                                        <input type="checkbox" id="note-{{ item[0]|replace(' ', '') }}" form="filterCriteria" name="tag" value="{{ item[0] }}" {% if item[0] in request.args.getlist('tag') %}checked{% endif %}>
+                                        <label for="note-{{ item[0]|replace(' ', '') }}" class="filter-toggle cloud-0 cloud-note">{{ item[0] }}</label>
+                                    </span>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+                {% if shuffledNotes|length >= 10 %}
+                    <div class="row pb-2 justify-content-center">
+                        <button id="showMoreNotes" type="button" aria-label="Toggle visibility of more flavour note options" class="show-more more-notes mt-4">Show more <i class="bi bi-chevron-compact-down"></i></button>
+                    </div>
+                {% endif %}
+            </div>
+            <hr>
+            <!-- SUBMIT/RESET -->
+            <div class="row justify-content-center mt-4">
+                <div class="col-12 form-group text-center">
+                    <a href="{{ url_for('browse') }}" class="btn btn-custom-secondary mx-2">Reset</a>
+                    <input id="submitCriteria" form="filterCriteria" type="submit" value="Search" class="btn btn-custom mx-2">
+                </div>
+            </div>
+        </div>
+        <hr>
+    </div>
+    {% if "origin", "roast", "organicRequired", "tag" in request.args %}
+        <div class="container">
+            <div class="row">
+                <div class="col-12 mb-4">
+                    <!-- ORIGIN VALIDATION -->
+                    {% if request.args.get("origin") != None %}
+                        {% for origin in request.args.getlist("origin") %}
+                            {% set originList = [] %}
+                            {% for value in request.args.getlist('origin') %}
+                                {% if not value == origin  %}
+                                    {% set x=originList.append(value) %}
+                                {% endif %}
+                            {% endfor %}
+                            {% set newArgs = {"origin": originList, "roast": request.args.getlist('roast'), "organicRequired": request.args.getlist('organicRequired'), "tag": request.args.getlist('tag'), "conditionType": request.args.getlist('conditionType') } %}
+                            <a href="{{ url_for('browse', **newArgs) }}" class="filterValidation">{{ origin|title }} <i class="ml-1 bi bi-x-circle"></i></i></a>
+                        {% endfor %}
+                    {% endif %}
+                    <!-- NOTE TAG VALIDATION -->
+                    {% if request.args.get("tag") != None %}
+                        {% for tag in request.args.getlist("tag") %}
+                            {% set tagList = [] %}
+                            {% for value in request.args.getlist('tag') %}
+                                {% if not value == tag  %}
+                                    {% set x=tagList.append(value) %}
+                                {% endif %}
+                            {% endfor %}
+                            {% set newArgs = {"origin": request.args.getlist('origin'), "roast": request.args.getlist('roast'), "organicRequired": request.args.getlist('organicRequired'), "tag": tagList, "conditionType": request.args.getlist('conditionType') } %}
+                            <a href="{{ url_for('browse', **newArgs) }}" class="filterValidation">{{ tag|title }} <i class="ml-1 bi bi-x-circle"></i></a>
+                        {% endfor %}
+                    {% endif %}
+                    <!-- ROAST VALIDATION -->
+                    {% if request.args.get("roast") != None %}
+                        {% for roast in request.args.getlist("roast") %}
+                            {% set roastList = [] %}
+                            {% for value in request.args.getlist('roast') %}
+                                {% if not value == roast  %}
+                                    {% set x=roastList.append(value) %}
+                                {% endif %}
+                            {% endfor %}
+                            {% set newArgs = {"origin": request.args.getlist('origin'), "roast": roastList, "organicRequired": request.args.getlist('organicRequired'), "tag": request.args.getlist('tag'), "conditionType": request.args.getlist('conditionType') } %}
+                            <a href="{{ url_for('browse', **newArgs) }}" class="filterValidation">{{ roast|title }} <i class="ml-1 bi bi-x-circle"></i></a>
+                        {% endfor %}
+                    {% endif %}
+                    <!-- ORGANIC VALIDATION -->
+                    {% if request.args.get("organicRequired") == "True" %}
+                        {% set newArgs = {"origin": request.args.getlist('origin'), "roast": request.args.getlist('roast'), "tag": request.args.getlist('tag'), "conditionType": request.args.getlist('conditionType') } %}
+                        <a href="{{ url_for('browse', **newArgs) }}" class="filterValidation">Organic <i class="ml-1 bi bi-x-circle"></i></a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    {{ pagination.input(pageQuantity, browseHeader, beansCount, page_variable, offset, formName="filterCriteria") }}
+    <div class="container-fluid">
+        {% if beans|length == 0 %}
+            <hr>
+            <h5 class="text-center">Sorry!</h5>
+            <p class="text-center">There are no beans listed matching this description!</p>
+        {% endif %}
+        {{ card.input(beans) }}
+    </div>
+    {{ pagination_bottom.input(pageQuantity, page_variable, formName="filterCriteria") }}
+<p id="content"></p>
+{% endblock %}
+{% block scripts %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script src="{{ url_for('static', filename='browse.js') }}"></script>
+{% endblock %}

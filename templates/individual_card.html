@@ -1,0 +1,35 @@
+{% macro input(submission) -%}
+    {% if submission['rating'] %}
+        {% set ratingsLength = submission['rating']|list|length %}
+        {% set totalRatings = [] %}
+        {% for score in range(ratingsLength) %}
+            {% set score = submission['rating'][score].score | int %}
+            {{ totalRatings.append(score) or "" }}
+        {% endfor %}
+        {% set averageRating = totalRatings | sum / ratingsLength %}
+        {% set averageRating = averageRating|round(1) %}                   
+    {% endif %}
+        <div class="card individual-card mx-auto">
+            {% if (session["user"] == submission.username) and (submission['_id'] is defined) %}<a href="{{ url_for('edit', beanId=submission['_id']) }}" class="btn btn-warning edit-btn">EDIT</a>{% endif %}
+            {% if submission['rating'] %}<span class="rating-btn"><i class="bi bi-star-fill pr-1"></i>{{ averageRating }}</span>{% endif %}
+            <a href="{{ url_for('viewSubmission', submissionId=submission['_id']) }}"><img src="{{ submission['img-url'] }}" class="card-img-top hover-shadow" alt="image of {{ submission.brand }} {{ submission.name }} coffee submission"></a>
+            <div class="card-body">
+                <h3 class="card-title coffee-card-title text-center mb-4"><a href="{{ url_for('viewSubmission', submissionId=submission['_id']) }}">{{ submission.brand }}: {{ submission.name }}</a></h3>
+                <ul class="bean-info">
+                    <li>Roast: {{ submission.roast }}</li>
+                    <li>Origin: {{ submission.origin }}</li>
+                    <li>{% if submission.organic %}Organic{% else %}Not organic{% endif %}</li>
+                    {% if submission.url %}<li><a href="{{ submission.url }}" target="_blank">More Info</a></li>{% endif %}
+                </ul>
+                <h5 class="text-center my-3">Notes:</h5>
+                <div class="notes-container">
+                    {% for note in submission.notes %}
+                        <a href="{{ url_for('browse', conditionType='all', tag=note) }}" class="note-bubble card-notes bean-note">{{ note }}</a>
+                    {% endfor %}
+                </div>
+                <div class="row mt-4 custom-card-footer justify-content-center">
+                    <div class="user-submitted text-muted mt-3 custom-capitalize">Submitted by <a href="{{ url_for('profile', username=submission.username) }}">{{ submission.full_name }}</a></div>
+                </div>
+            </div>
+        </div>
+{%- endmacro %}
