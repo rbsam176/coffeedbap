@@ -7,6 +7,7 @@ const configuration = {
     clientKey: "test_2GWNBLODVRBSLBBSJAZM2BVOUATCOSNH", // Web Drop-in versions before 3.10.1 use originKey instead of clientKey.
     locale: "en-GB",
     environment: "test",
+    buttonType: 'plain',
     onSubmit: (state, dropin) => {
         // Global configuration for onSubmit
         // Your function calling your server to make the `/payments` request
