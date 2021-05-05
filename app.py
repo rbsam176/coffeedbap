@@ -36,7 +36,8 @@ def adyen_payment_methods():
         'reference': 'paymentMethods call',
         'shopperReference': 'Python Checkout Shopper',
         'channel': 'Web',
-        'amount': 1,
+        'amount.currency': 'GBP',
+        'countryCode': 'GB'
     }
     # print("/paymentMethods request:\n" + str(payment_methods_request))
 
