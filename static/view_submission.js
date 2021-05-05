@@ -53,22 +53,16 @@ var jsonCall = $.getJSON("/api/getPaymentMethods",function(){
         }
     };
     const checkout = new AdyenCheckout(configuration);
-    // const dropin = checkout
-    //     .create('dropin', {
-    //     // Starting from version 4.0.0, Drop-in configuration only accepts props related to itself and cannot contain generic configuration like the onSubmit event.
-    //         openFirstPaymentMethod:false
-    //     })
-    // .mount('#dropin-container');
     const dropin = checkout
         .create('dropin', {
             paymentMethodsConfiguration: {
             // Required configuration for Apple Pay
             applepay: {
                 amount: {
-                    value: 1000,
-                    currency: "EUR"
+                    value: 1,
+                    currency: "GBP"
                 },
-                countryCode: "DE",
+                countryCode: "GB",
                 onSubmit: (state) => {
                 // Call your server to make `/payments` request
                 makePayment(state.data)
