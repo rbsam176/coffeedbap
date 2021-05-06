@@ -22,15 +22,15 @@ var jsonCall = $.getJSON("/api/getPaymentMethods",function(){
         },
     };
     const checkout = new AdyenCheckout(configuration);
-    // const dropin = checkout
-    //     .create('dropin', {
-    //         paymentMethodsConfiguration: {
-    //         // Required configuration for Apple Pay
-    //         applepay: {
-    //         }
-    //         },
-    //     })
-    //     .mount('#dropin-container');
+    const dropin = checkout
+        .create('dropin', {
+            // paymentMethodsConfiguration: {
+            // // Required configuration for Apple Pay
+            // applepay: {
+            // }
+            // },
+        })
+        .mount('#dropin-container');
 });
 
 
