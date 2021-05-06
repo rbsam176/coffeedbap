@@ -12,23 +12,17 @@ var jsonCall = $.getJSON("/api/getPaymentMethods",function(){
         },
         countryCode: "GB",
         environment: "test",
-        buttonType: 'plain',
-        onSubmit: (state) => {
-            console.log(state);
-
-            if (state.isValid) {
-                handleSubmission(state, component, "/api/initiatePayment");
-            }
+        onSubmit: (state, dropin) => {
+            console.log(state)
+            console.log('hi')
+            console.log(dropin)
         },
+        buttonType: 'plain',
     };
     const checkout = new AdyenCheckout(configuration);
     const dropin = checkout
         .create('dropin', {
-            // paymentMethodsConfiguration: {
-            // // Required configuration for Apple Pay
-            // applepay: {
-            // }
-            // },
+            console.log('bye')
         })
         .mount('#dropin-container');
 });
