@@ -13,7 +13,7 @@ var jsonCall = $.getJSON("/api/getPaymentMethods",function(){
         countryCode: "GB",
         environment: "test",
         buttonType: 'plain',
-        onSubmit: (state, component) => {
+        onSubmit: (state, dropin) => {
             console.log(state);
 
             if (state.isValid) {
@@ -71,17 +71,24 @@ var jsonCall = $.getJSON("/api/getPaymentMethods",function(){
             paymentMethodsConfiguration: {
             // Required configuration for Apple Pay
             applepay: {
-                onSubmit: (state) => {
+                // onSubmit: (state) => {
                 // Call your server to make `/payments` request
-                makePayment(state.data)
-                    .then(response => {
-                    // Your function to show the final result to the shopper
-                    showFinalResult(response);
-                    })
-                    .catch(error => {
-                    throw Error(error);
-                    });
-                }
+                // makePayment(state.data)
+                //     .then(response => {
+                //     // Your function to show the final result to the shopper
+                //     showFinalResult(response);
+                //     })
+                //     .catch(error => {
+                //     throw Error(error);
+                //     });
+                // }
+                onSubmit: (state, dropin) => {
+                    console.log(state);
+    
+                    if (state.isValid) {
+                        handleSubmission(state, component, "/api/initiatePayment");
+                    }
+                }    
             }
             },
         })
