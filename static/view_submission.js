@@ -13,7 +13,7 @@ var jsonCall = $.getJSON("/api/getPaymentMethods",function(){
         countryCode: "GB",
         environment: "test",
         buttonType: 'plain',
-        onSubmit: (state, dropin) => {
+        onSubmit: (state) => {
             console.log(state);
 
             if (state.isValid) {
@@ -82,7 +82,7 @@ var jsonCall = $.getJSON("/api/getPaymentMethods",function(){
                 //     throw Error(error);
                 //     });
                 // }
-                onSubmit: (state, dropin) => {
+                onSubmit: (state) => {
                     console.log(state);
     
                     if (state.isValid) {
