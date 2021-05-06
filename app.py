@@ -51,32 +51,6 @@ def get_payment_methods():
     payment_methods_response = adyen_payment_methods()
     return payment_methods_response
 
-# EXPERIMENT
-
-@app.route('/api/initiatePayment', methods=['POST'])
-def initiate_payment():
-    payment_response = adyen_payments(request)
-    print(payment_response)
-    return payment_response
-
-@app.route('/result/success', methods=['GET'])
-def checkout_success():
-    return render_template('checkout-success.html')
-
-@app.route('/result/failed', methods=['GET'])
-def checkout_failure():
-    return render_template('checkout-failed.html')
-
-@app.route('/result/pending', methods=['GET'])
-def checkout_pending():
-    return render_template('checkout-success.html')
-
-@app.route('/result/error', methods=['GET'])
-def checkout_error():
-    return render_template('checkout-failed.html')
-
-# END EXPERIMENT
-
 
 
 

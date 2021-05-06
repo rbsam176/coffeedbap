@@ -21,128 +21,19 @@ var jsonCall = $.getJSON("/api/getPaymentMethods",function(){
             }
         },
     };
-        // onSubmit: (state, dropin) => {
-        //     // Global configuration for onSubmit
-        //     // Your function calling your server to make the `/payments` request
-        //     makePayment(state.data)
-        //     .then(response => {
-        //         if (response.action) {
-        //         // Drop-in handles the action object from the /payments response
-        //         dropin.handleAction(response.action);
-        //         } else {
-        //         // Your function to show the final result to the shopper
-        //         showFinalResult(response);
-        //         }
-        //     })
-        //     .catch(error => {
-        //         throw Error(error);
-        //     });
-        // },
-        // onAdditionalDetails: (state, dropin) => {
-        // // Your function calling your server to make a `/payments/details` request
-        // makeDetailsCall(state.data)
-        //     .then(response => {
-        //     if (response.action) {
-        //         // Drop-in handles the action object from the /payments response
-        //         dropin.handleAction(response.action);
-        //     } else {
-        //         // Your function to show the final result to the shopper
-        //         showFinalResult(response);
-        //     }
-        //     })
-        //     .catch(error => {
-        //     throw Error(error);
-        //     });
-        // },
-        // paymentMethodsConfiguration: {
-        // card: { // Example optional configuration for Cards
-        //     hasHolderName: true,
-        //     holderNameRequired: true,
-        //     enableStoreDetails: true,
-        //     hideCVC: false, // Change this to true to hide the CVC field for stored cards
-        //     name: 'Credit or debit card',
-        //     onSubmit: () => {}, // onSubmit configuration for card payments. Overrides the global configuration.
-        // }
-        // }
-    // };
     const checkout = new AdyenCheckout(configuration);
-    const dropin = checkout
-        .create('dropin', {
-            paymentMethodsConfiguration: {
-            // Required configuration for Apple Pay
-            applepay: {
-                // onSubmit: (state) => {
-                // Call your server to make `/payments` request
-                // makePayment(state.data)
-                //     .then(response => {
-                //     // Your function to show the final result to the shopper
-                //     showFinalResult(response);
-                //     })
-                //     .catch(error => {
-                //     throw Error(error);
-                //     });
-                // }
-                onSubmit: (state) => {
-                    console.log(state);
-    
-                    if (state.isValid) {
-                        handleSubmission(state, component, "/api/initiatePayment");
-                    }
-                }    
-            }
-            },
-        })
-        .mount('#dropin-container');
+    // const dropin = checkout
+    //     .create('dropin', {
+    //         paymentMethodsConfiguration: {
+    //         // Required configuration for Apple Pay
+    //         applepay: {
+    //         }
+    //         },
+    //     })
+    //     .mount('#dropin-container');
 });
 
 
-// EXPERIMENT
-
-async function handleSubmission(state, component, url) {
-	try {
-		const res = await callServer(url, state.data);
-		handleServerResponse(res, component);
-	} catch (error) {
-		console.error(error);
-		alert("Error occurred. Look at console for details");
-	}
-}
-
-// Calls your server endpoints
-async function callServer(url, data) {
-	const res = await fetch(url, {
-		method: "POST",
-		body: data ? JSON.stringify(data) : "",
-		headers: {
-			"Content-Type": "application/json"
-		}
-	});
-
-	return await res.json();
-}
-
-// Handles responses sent from your server to the client
-function handleServerResponse(res, component) {
-	if (res.action) {
-		component.handleAction(res.action);
-	} else {
-		switch (res.resultCode) {
-			case "Authorised":
-				window.location.href = "/result/success";
-				break;
-			case "Pending":
-			case "Received":
-				window.location.href = "/result/pending";
-				break;
-			case "Refused":
-				window.location.href = "/result/failed";
-				break;
-			default:
-				window.location.href = "/result/error";
-				break;
-		}
-	}
-}
 
 
 
