@@ -12,16 +12,16 @@ var jsonCall = $.getJSON("/api/getPaymentMethods",function(){
         },
         countryCode: "GB",
         environment: "test",
-        onSubmit: (state, dropin) => {
-            console.log(state)
-            console.log('hi')
-            console.log(dropin)
-        },
         buttonType: 'plain',
     };
     const checkout = new AdyenCheckout(configuration);
     const dropin = checkout
         .create('dropin', {
+            onSubmit: (state, dropin) => {
+                console.log(state)
+                console.log('hi')
+                console.log(dropin)
+            },
         })
         .mount('#dropin-container');
 });
