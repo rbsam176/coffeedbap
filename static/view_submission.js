@@ -23,7 +23,6 @@ var jsonCall = $.getJSON("/api/getPaymentMethods",function(){
     const dropin = checkout
         .create('dropin', {
         })
-        console.log('bye')
         .mount('#dropin-container');
 });
 
